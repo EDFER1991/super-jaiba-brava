@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000000">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Super Jaiba Brava</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,6 +39,11 @@
   <div class="tb" id="bA" data-k="Space">A</div>
   <div class="tb" id="bS" data-k="Enter">START</div>
 </div>
-<script src="js/game.js"></script>
+<!-- juego -->
+<script>
+  // carga siempre la version mas reciente del juego (evita la cache del navegador)
+  (function () { var s = document.createElement('script'); s.src = 'js/game.js?v=' + Date.now(); document.body.appendChild(s); })();
+</script>
+<!-- /juego -->
 </body>
 </html>

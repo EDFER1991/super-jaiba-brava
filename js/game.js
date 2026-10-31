@@ -50,6 +50,7 @@ function drawJaiba(big, view, cx, bottom, scale, rot, sy) {
   var w = im.width * scale, h = im.height * scale * sy;
   sprite(im, cx - w / 2, bottom - h, w, h, false, rot || 0);
 }
+var ASSET_V = 3; // subir este numero cuando cambien las imagenes, para saltar la cache
 var IMG = {};
 function loadAssets(done) {
   var keys = Object.keys(SRC), left = keys.length;
@@ -60,7 +61,7 @@ function loadAssets(done) {
       if (++tries < 4) setTimeout(function () { im.src = SRC[k] + (SRC[k].indexOf('data:') === 0 ? '' : '?r=' + tries); }, 300 * tries);
       else if (--left === 0) done();
     };
-    im.src = SRC[k];
+    im.src = SRC[k] + (SRC[k].indexOf('data:') === 0 ? '' : '?v=' + ASSET_V);
     IMG[k] = im;
   });
 }

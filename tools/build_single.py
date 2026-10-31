@@ -18,8 +18,9 @@ for key, path in re.findall(r"(\w+): '([^']+)'", src):
     assets[key] = "data:image/png;base64," + data
 
 inline = "window.ASSETS = {" + ",".join('"%s":"%s"' % kv for kv in assets.items()) + "};\n"
-html = html.replace('<script src="js/game.js"></script>',
-                    "<script>\n" + inline + "</script>\n<script>\n" + game.replace("</script", r"<\/script") + "\n</script>")
+html = re.sub(r"<!-- juego -->.*?<!-- /juego -->",
+              lambda m: "<script>\n" + inline + "</script>\n<script>\n" + game.replace("</script", r"<\/script") + "\n</script>",
+              html, flags=re.S)
 out = os.path.join(ROOT, "SuperJaibaBrava.html")
 open(out, "w", encoding="utf-8").write(html)
 print(out, round(os.path.getsize(out) / 1024), "KB")
