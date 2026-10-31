@@ -38,8 +38,11 @@ var SRC = window.ASSETS || {
   jc_0: 'assets/jc_0.png', jc_1: 'assets/jc_1.png', jc_2: 'assets/jc_2.png', jc_3: 'assets/jc_3.png',
   jc_4: 'assets/jc_4.png', jc_5: 'assets/jc_5.png', jc_6: 'assets/jc_6.png', jc_7: 'assets/jc_7.png',
   jg_0: 'assets/jg_0.png', jg_1: 'assets/jg_1.png', jg_2: 'assets/jg_2.png', jg_3: 'assets/jg_3.png',
-  jg_4: 'assets/jg_4.png', jg_5: 'assets/jg_5.png', jg_6: 'assets/jg_6.png', jg_7: 'assets/jg_7.png'
+  jg_4: 'assets/jg_4.png', jg_5: 'assets/jg_5.png', jg_6: 'assets/jg_6.png', jg_7: 'assets/jg_7.png',
+  // presentador (sin copa) y la copa por separado para animar la entrega
+  presentador: 'assets/presentador.png', copa: 'assets/copa.png'
 };
+var CUP_DX = 33, CUP_DY = 49; // posicion de la copa en las manos del presentador
 var VIEW = { frente: 0, frente2: 7, derecha: 2, izquierda: 6, espalda: 3 };
 function jaibaImg(big, view) { return IMG[(big ? 'jg_' : 'jc_') + VIEW[view]]; }
 // dibuja la jaiba con su tamano real, centrada en cx y con los pies en 'bottom'
@@ -50,7 +53,7 @@ function drawJaiba(big, view, cx, bottom, scale, rot, sy) {
   var w = im.width * scale, h = im.height * scale * sy;
   sprite(im, cx - w / 2, bottom - h, w, h, false, rot || 0);
 }
-var ASSET_V = 3; // subir este numero cuando cambien las imagenes, para saltar la cache
+var ASSET_V = 4; // subir este numero cuando cambien las imagenes, para saltar la cache
 var IMG = {};
 function loadAssets(done) {
   var keys = Object.keys(SRC), left = keys.length;
@@ -762,8 +765,9 @@ function updatePlay() {
     kickT = 0;
   }
   // trofeo
-  if (L.trophy && G.bossDone && P.x + P.w > L.trophy * T && !P.dead && G.state === 'play') {
-    saveTop(); audio.play('victoria'); setState('victory');
+  if (L.trophy && G.bossDone && P.x + P.w > L.trophy * T - 34 && !P.dead && G.state === 'play') {
+    P.auto = true; P.vx = 0; P.dir = 1; shots.length = 0;
+    audio.sfx('power'); setState('entrega');
   }
 }
 
@@ -988,18 +992,53 @@ function drawGoal(gx, gy) {
   R(ctx, fx + 4, gy - 150, 46, 30, '#1050c0'); R(ctx, fx + 4, gy - 140, 46, 10, '#fff');
   if (IMG.logoV.width) ctx.drawImage(IMG.logoV, fx + 14, gy - 152, 34, 34);
 }
-function drawTrophy(x, y, s) {
-  s = s || 1;
-  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-  var Gd = '#f8c820', Dk = '#a86a00', Lt = '#fff6b0';
-  R(ctx, -20, -8, 40, 8, '#6a3a10'); R(ctx, -14, -16, 28, 8, Dk);
-  R(ctx, -4, -30, 8, 14, Gd); R(ctx, -10, -34, 20, 4, Dk);
-  R(ctx, -22, -70, 44, 36, Gd); R(ctx, -18, -66, 6, 28, Lt); R(ctx, 12, -66, 6, 30, Dk);
-  R(ctx, -32, -66, 10, 6, Gd); R(ctx, -34, -62, 6, 18, Gd); R(ctx, -30, -46, 8, 6, Gd);
-  R(ctx, 22, -66, 10, 6, Gd); R(ctx, 28, -62, 6, 18, Gd); R(ctx, 22, -46, 8, 6, Gd);
-  R(ctx, -24, -72, 48, 4, Lt);
-  disc(ctx, 0, -52, 7, '#1050c0', 2);
-  ctx.restore();
+// ---------------------------------------------------------------- entrega de la copa
+function presenterPos() { var x = L.trophy * T; return { x: x, y: groundBelow(x + 50) - 140 }; }
+function entregaHop() { return G.state === 'entrega' && G.t > 130 ? -Math.abs(Math.sin((G.t - 130) * 0.12)) * 12 : 0; }
+// posicion de la copa: en manos del presentador, en vuelo, o sobre la cabeza de la jaiba
+function cupPos() {
+  var pp = presenterPos(), sx = pp.x + CUP_DX, sy = pp.y + CUP_DY;
+  if (G.state !== 'entrega' || G.t < 70) return { x: sx, y: sy };
+  var ex = P.x + P.w / 2 - 23, ey = P.y - 50 + entregaHop();
+  var k = Math.min(1, (G.t - 70) / 60);
+  return { x: sx + (ex - sx) * k, y: sy + (ey - sy) * k - Math.sin(Math.PI * k) * 60 };
+}
+function drawBubble(lines, cx, bottom) {
+  var w = 0; ctx.font = '10px ' + FONT;
+  lines.forEach(function (l) { w = Math.max(w, ctx.measureText(clean(l)).width); });
+  w += 24; var h = lines.length * 16 + 16, x = Math.round(cx - w / 2), y = Math.round(bottom - h - 12);
+  R(ctx, x + 2, y - 2, w - 4, h + 4, '#000'); R(ctx, x - 2, y + 2, w + 4, h - 4, '#000');
+  R(ctx, x, y, w, h, '#000'); R(ctx, x + 2, y + 2, w - 4, h - 4, '#fff');
+  // colita del globo
+  R(ctx, cx - 6, y + h - 2, 14, 4, '#fff'); R(ctx, cx - 8, y + h, 4, 6, '#000'); R(ctx, cx - 4, y + h + 2, 4, 6, '#fff');
+  R(ctx, cx, y + h + 2, 4, 6, '#000'); R(ctx, cx - 4, y + h + 8, 8, 4, '#000');
+  lines.forEach(function (l, i) { text(l, cx, y + 10 + i * 16, 10, '#000', 'center', false); });
+}
+function drawPresenter() {
+  var pp = presenterPos();
+  ctx.drawImage(IMG.presentador, pp.x, pp.y);
+  if (G.state === 'entrega') {
+    drawBubble(G.t < 130 ? ['¡NOTICIA DE', 'ÚLTIMA HORA!'] : ['¡FELICIDADES!'], pp.x + 54, pp.y - 4);
+  } else if (G.bossDone && G.t % 80 < 60) {
+    drawBubble(['¡VEN POR', 'LA COPA!'], pp.x + 54, pp.y - 4);
+  }
+}
+function drawCup() { var c = cupPos(); ctx.drawImage(IMG.copa, Math.round(c.x), Math.round(c.y)); }
+function updateEntrega() {
+  updatePlayer();
+  var pp = presenterPos();
+  cam.x = clamp((P.x + pp.x + 107) / 2 - W / 2, 0, L.w * T - W);
+  if (G.t === 70) audio.sfx('appear');
+  if (G.t === 130) { audio.play('gol'); addScore(10000, P.x - 20, P.y - 70); }
+  if (G.t > 130 && G.t % 3 === 0) {
+    parts.push({ kind: 'fw', x: cam.x + rnd(0, W), y: -10, vx: rnd(-1, 1), vy: rnd(1.5, 3), g: 0.02, life: 260,
+      c: ['#ffe040', '#2a8cff', '#ffffff', '#40e0ff'][Math.floor(rnd(0, 4))] });
+  }
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var p = parts[i]; p.vy += p.g; p.x += p.vx; p.y += p.vy; if (--p.life <= 0) parts.splice(i, 1);
+  }
+  for (i = pops.length - 1; i >= 0; i--) { pops[i].y -= 0.8; if (--pops[i].life <= 0) pops.splice(i, 1); }
+  if (G.t > 360) { saveTop(); audio.play('victoria'); setState('victory'); }
 }
 function drawPlane(x, y, s, flip, ang) {
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(ang || 0); if (flip) ctx.scale(-1, 1); ctx.scale(s, s);
@@ -1034,6 +1073,7 @@ function drawPlayer() {
     view = Math.floor(G.golT / 12) % 2 ? 'frente' : 'frente2';
     bob = -Math.abs(Math.sin(G.golT * 0.15)) * 14;
   }
+  else if (G.state === 'entrega') { view = G.t > 130 ? 'frente' : 'derecha'; bob = entregaHop(); }
   else if (G.dialog > 0) view = side;
   else if (!P.onGround) { sy = P.vy < 0 ? 1.06 : 0.97; rot = P.dir * 0.06; }
   else if (Math.abs(P.vx) > 0.3) { bob = Math.abs(Math.sin(P.anim)) * -4; rot = Math.sin(P.anim) * 0.07; sy = 1 - Math.abs(Math.cos(P.anim)) * 0.04; }
@@ -1140,15 +1180,12 @@ function drawWorld() {
     R(ctx, Math.round(p.x), Math.round(p.y) + 10, p.w, 2, '#3a1a06');
   });
   if (L.goal) drawGoal(L.goal * T, groundBelow(L.goal * T + 16));
-  if (L.trophy) {
-    var ty2 = groundBelow(L.trophy * T);
-    drawTrophy(L.trophy * T + 16, ty2 + Math.sin(G.t * 0.08) * 3 - 4, 1);
-    if (G.bossDone && G.t % 30 < 20) text('¡COPA!', L.trophy * T - 10, ty2 - 110, 12, '#ffe040');
-  }
+  if (L.trophy) drawPresenter();
   items.forEach(function (it) { if (!(it.rise > 0)) drawBall(it.x + 12, it.y + 12, 12, it.x * 0.08, true); });
   enemies.forEach(function (e) { if (e.alive && e.active) drawCoco(e); });
   if (boss) drawBoss();
   if (!P.dead || G.state === 'dying') drawPlayer();
+  if (L.trophy) drawCup();
   if (goalBall) drawBall(goalBall.x, goalBall.y, 10, goalBall.rot);
   shots.forEach(drawShot);
   parts.forEach(function (p) {
@@ -1364,13 +1401,14 @@ function drawVictory() {
   var tiles = TILES.jefe || TILES.playa;
   for (var x = 0; x < W / T + 1; x++) { ctx.drawImage(tiles.top[x % 3], x * T, 12 * T); ctx.drawImage(tiles.fill[x % 3], x * T, 13 * T); }
   if (IMG.logoV.width) ctx.drawImage(IMG.logoV, 40, 150, 140, 140);
-  drawTrophy(W / 2, 384, 1.6);
-  var jy = Math.abs(Math.sin(G.t * 0.1)) * -40;
-  drawJaiba(true, 'frente', W / 2 + 100, 384 + jy);
-  drawJaiba(true, 'frente2', W / 2 - 100, 384 + Math.abs(Math.sin(G.t * 0.1 + 1.5)) * -40);
-  outlined('¡JAIBA BRAVA', W / 2, 40, 30, '#ffe040', '#7a2a00', 3);
-  outlined('ES CAMPEÓN!', W / 2, 82, 30, '#2a8cff', '#ffffff', 3);
-  text('EL CAMINO A SER CAMPEÓN: COMPLETADO', W / 2, 134, 10, '#fff', 'center');
+  // el presentador y la jaiba con la copa en alto
+  if (IMG.presentador.width) ctx.drawImage(IMG.presentador, W / 2 - 200, 384 - 182, 139, 182);
+  var jy = -Math.abs(Math.sin(G.t * 0.1)) * 30;
+  drawJaiba(true, 'frente', W / 2 + 20, 384 + jy);
+  if (IMG.copa.width) ctx.drawImage(IMG.copa, W / 2 + 20 - 28, 384 + jy - 62 - 54, 56, 57);
+  outlined('¡LA JAIBA', W / 2, 40, 30, '#ffe040', '#7a2a00', 3);
+  outlined('AVANZA!', W / 2, 82, 30, '#2a8cff', '#ffffff', 3);
+  text('MUNDO 1 COMPLETADO: EL CAMINO A SER CAMPEÓN SIGUE', W / 2, 134, 10, '#fff', 'center');
   text('PUNTOS ' + ('000000' + G.score).slice(-6), W - 40, 170, 12, '#fff', 'right');
   text('MONEDAS x' + G.coins, W - 40, 192, 12, '#ffe040', 'right');
   if (G.t > 120 && G.t % 60 < 40) text('ENTER: MENÚ', W - 40, 230, 10, '#fff', 'right');
@@ -1393,6 +1431,7 @@ function step() {
       if (!G.paused) updatePlay();
       break;
     case 'goal': updateGoal(); break;
+    case 'entrega': updateEntrega(); break;
     case 'dying':
       if (G.t > 30) { P.vy += 0.5; P.y += P.vy; }
       if (G.t > 170) {
@@ -1416,8 +1455,9 @@ function draw() {
     case 'controls': drawControls(); break;
     case 'intro': drawIntro(); break;
     case 'card': drawCard(); break;
-    case 'play': case 'goal': case 'dying':
+    case 'play': case 'goal': case 'dying': case 'entrega':
       drawWorld(); drawHUD();
+      if (G.state === 'entrega' && G.t > 150) outlined('¡LA JAIBA AVANZA!', W / 2, 58, 26, '#ffe040', '#0a3a9a', 3);
       if (G.dialog > 0) drawDialog();
       if (G.state === 'goal' && G.golT > 0) {
         var s = 30 + Math.sin(G.t * 0.3) * 4;

@@ -17,7 +17,7 @@ Juego de plataformas en 8 bits hecho con HTML5 Canvas, sin librerías. Funciona 
 1. **1-1 Playa de La Ceiba**
 2. **1-2 Selva Catracha**
 3. **1-3 Nacaome, Valle**
-4. **1-4 ¡El Pirata!**: hay que darle 3 golpes en la cabeza al jefe.
+4. **1-4 ¡El Pirata!**: hay que darle 3 golpes en la cabeza al jefe. Luego el presentador te entrega la copa: **¡LA JAIBA AVANZA!**
 
 ## Archivos
 - `index.html` + `js/game.js` + `assets/`: versión web.
