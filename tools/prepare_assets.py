@@ -82,7 +82,7 @@ if __name__ == "__main__":
     background("9.webp", "mapa.png")
     sheet("jaiba_chica.webp", "jc", 46)
     sheet("jaiba_grande.webp", "jg", 62)
-    sprite("7.png", "coco.png", 34)
+    sprite("7.png", "coco.png", 44)
     sprite("3.webp", "pirata.png", 130)
     sprite("8.webp", "logo_victoria.png", 150, thresh=235)
     sprite("5.webp", "logo_pirata.png", 150, thresh=235)

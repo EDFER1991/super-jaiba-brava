@@ -462,10 +462,10 @@ function build11() {
   en(L, 'coco', 24); col(L, 27, 10); en(L, 'coco', 32); en(L, 'coco', 34); put(L, 31, 7, 'ooo');
   gr(L, 42, 70);
   put(L, 45, 8, 'BBB'); put(L, 47, 4, '?B?'); en(L, 'coco', 52); en(L, 'coco', 54);
-  put(L, 57, 10, 'ooo'); put(L, 61, 11, '^^'); col(L, 66, 9); en(L, 'coco', 69);
+  put(L, 57, 10, 'ooo'); col(L, 66, 9); en(L, 'coco', 69);
   gr(L, 74, 110);
   put(L, 78, 8, 'B?B'); col(L, 84, 10); put(L, 86, 7, 'oooo'); col(L, 90, 9); en(L, 'coco', 92); en(L, 'coco', 94);
-  put(L, 96, 8, 'BBBB?BBB'); put(L, 99, 4, 'oo'); en(L, 'coco', 100); put(L, 104, 11, '^^^');
+  put(L, 96, 8, 'BBBB?BBB'); put(L, 99, 4, 'oo'); en(L, 'coco', 100);
   plat(L, 113, 10, 3, 'x', 2, 0.025); put(L, 113, 6, 'ooo');
   gr(L, 118, 127); stairs(L, 124, 4, 1); gr(L, 130, 150); stairs(L, 130, 4, -1);
   en(L, 'coco', 138); en(L, 'coco', 140); en(L, 'rodante', 148);
@@ -482,12 +482,12 @@ function build12() {
   put(L, 31, 9, '=============='); en(L, 'coco', 36, 8); en(L, 'coco', 41, 8); put(L, 33, 5, 'oooo');
   gr(L, 45, 52, 9); put(L, 48, 5, 'M');
   gr(L, 53, 75); stairs(L, 53, 3, -1);
-  put(L, 60, 8, 'B?BB'); put(L, 61, 4, 'oooo'); en(L, 'rodante', 64); en(L, 'coco', 68); put(L, 71, 11, '^^^');
+  put(L, 60, 8, 'B?BB'); put(L, 61, 4, 'oooo'); en(L, 'rodante', 64); en(L, 'coco', 68);
   plat(L, 78, 9, 2, 'y', 2, 0.03); plat(L, 81, 7, 2, 'y', 2, 0.03, Math.PI);
   gr(L, 84, 110); en(L, 'coco', 88); en(L, 'coco', 90); en(L, 'coco', 92); col(L, 96, 9); put(L, 99, 8, '?'); put(L, 102, 8, 'BMB');
-  put(L, 106, 11, '^^');
+ 
   gr(L, 114, 125, 10); en(L, 'coco', 118, 9); put(L, 116, 6, 'B?B'); put(L, 120, 5, 'ooo');
-  gr(L, 130, 150); put(L, 133, 11, '^^'); put(L, 137, 11, '^^'); en(L, 'coco', 142); en(L, 'rodante', 147); put(L, 140, 8, 'oooo');
+  gr(L, 130, 150); en(L, 'coco', 142); en(L, 'rodante', 147); put(L, 140, 8, 'oooo');
   put(L, 151, 10, '===='); put(L, 158, 9, '==='); put(L, 163, 10, '====');
   put(L, 159, 6, 'oo');
   gr(L, 167, 199); en(L, 'coco', 172); en(L, 'coco', 174);
@@ -502,10 +502,10 @@ function build13() {
   gr(L, 33, 60); stairs(L, 38, 3, 1);
   put(L, 45, 8, 'XXXXXX'); en(L, 'coco', 48, 7); put(L, 46, 4, '?M?'); en(L, 'rodante', 56);
   plat(L, 62, 10, 2, 'y', 3, 0.025);
-  gr(L, 67, 95); put(L, 70, 11, '^'); put(L, 74, 11, '^^'); en(L, 'coco', 78); en(L, 'coco', 80); en(L, 'rodante', 86);
+  gr(L, 67, 95); en(L, 'coco', 78); en(L, 'coco', 80); en(L, 'rodante', 86);
   put(L, 82, 8, 'B?B?B'); col(L, 90, 10); col(L, 93, 9);
   gr(L, 99, 130); en(L, 'coco', 104); en(L, 'coco', 106); en(L, 'coco', 108);
-  put(L, 110, 8, '====='); put(L, 110, 6, 'ooooo'); en(L, 'rodante', 120); put(L, 124, 11, '^^^');
+  put(L, 110, 8, '====='); put(L, 110, 6, 'ooooo'); en(L, 'rodante', 120);
   plat(L, 132, 10, 3, 'x', 1.5, 0.03); plat(L, 136, 8, 3, 'x', 1.5, 0.03, Math.PI);
   gr(L, 141, 199); en(L, 'coco', 146); en(L, 'coco', 148); en(L, 'coco', 150); en(L, 'coco', 152);
   put(L, 155, 8, '?B?B?'); stairs(L, 165, 4, 1); stairs(L, 169, 4, -1); en(L, 'rodante', 178);
@@ -544,7 +544,7 @@ function startLevel() {
   L = def.build(); TH = THEMES[def.theme];
   if (!TILES[def.theme]) TILES[def.theme] = genTiles(TH);
   enemies = L.ents.map(function (e) {
-    return { type: e.type, x: e.x * T + 2, y: (e.row + 1) * T - 30, w: 28, h: 30, vx: e.type === 'rodante' ? -2.3 : -1, vy: 0, alive: true, dead: null, dt: 0, active: false, rot: 0 };
+    return { type: e.type, x: e.x * T - 2, y: (e.row + 1) * T - 40, w: 36, h: 40, vx: e.type === 'rodante' ? -2.3 : -1, vy: 0, alive: true, dead: null, dt: 0, active: false, rot: 0 };
   });
   plats = L.plats.map(function (p) { return { bx: p.bx, by: p.by, x: p.bx, y: p.by, w: p.w, h: p.h, axis: p.axis, range: p.range, speed: p.speed, phase: p.phase, dx: 0, dy: 0 }; });
   items = []; parts = []; pops = []; shots = []; bumps = []; goalBall = null; kickT = 0;
@@ -704,13 +704,13 @@ function updatePlay() {
     }
     // contacto con jugador
     if (!P.dead && overlap(P, e)) {
-      if (P.vy > 0 && P.y + P.h - P.vy <= e.y + 12) {
+      if (P.vy > 0 && P.y + P.h - P.vy <= e.y + 18) {
         e.dead = 'squash'; e.dt = 0; audio.sfx('stomp');
         P.vy = K.jump() ? -11 : -7.5;
         P.stompChain++;
         var pts = [100, 200, 400, 800, 1000, 2000, 4000, 5000][Math.min(P.stompChain - 1, 7)];
         addScore(pts, e.x, e.y - 10);
-      } else hurtPlayer();
+      } else if (overlap(P, { x: e.x + 9, y: e.y + 12, w: e.w - 18, h: e.h - 12 })) hurtPlayer(); // zona de dano reducida
     }
   }
   // items
@@ -1042,14 +1042,14 @@ function drawPlayer() {
 }
 function drawCoco(e) {
   var img = IMG.coco;
-  if (e.dead === 'squash') { sprite(img, e.x - 2, e.y + 18, 32, 14); return; }
-  if (e.dead === 'flip') { sprite(img, e.x - 2, e.y - 2, 32, 34, false, Math.PI + e.rot * 0.2); return; }
+  if (e.dead === 'squash') { sprite(img, e.x - 3, e.y + 24, 42, 18); return; }
+  if (e.dead === 'flip') { sprite(img, e.x - 3, e.y - 2, 42, 44, false, Math.PI + e.rot * 0.2); return; }
   if (e.type === 'rodante') {
-    sprite(img, e.x - 2, e.y - 2, 32, 34, false, e.rot);
+    sprite(img, e.x - 3, e.y - 2, 42, 44, false, e.rot);
     return;
   }
   var step = Math.floor(G.t / 10) % 2;
-  sprite(img, e.x - 2, e.y - 4 + (step ? 1 : 0), 32, 34, e.vx > 0 ? step === 0 : step === 1);
+  sprite(img, e.x - 3, e.y - 4 + (step ? 1 : 0), 42, 44, e.vx > 0 ? step === 0 : step === 1);
 }
 function drawBoss() {
   var b = boss;
@@ -1207,7 +1207,7 @@ function drawTitle() {
   drawJaiba(true, Math.floor(titleT / 60) % 4 === 3 ? 'frente2' : 'frente', 140, 12 * T + jb);
   titleCocos.forEach(function (c) {
     var st = Math.floor(titleT / 10) % 2;
-    sprite(IMG.coco, c.x, 12 * T - 34, 32, 34, c.d > 0 ? !st : !!st);
+    sprite(IMG.coco, c.x, 12 * T - 44, 42, 44, c.d > 0 ? !st : !!st);
   });
   // menu
   var opts = ['1 JUGADOR', 'CONTROLES'];
