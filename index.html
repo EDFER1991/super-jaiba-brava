@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>Super Jaiba Brava</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  body { display: flex; align-items: center; justify-content: center; }
+  #game { display: block; image-rendering: pixelated; image-rendering: crisp-edges; -ms-interpolation-mode: nearest-neighbor;
+    background: #000; width: 768px; height: 432px; }
+  #touch { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #touch.on { display: block; }
+  .tb { position: absolute; pointer-events: auto; width: 68px; height: 68px; border-radius: 50%;
+    background: rgba(255,255,255,.18); border: 3px solid rgba(255,255,255,.5); color: #fff;
+    font: 14px "Press Start 2P", monospace; display: flex; align-items: center; justify-content: center; }
+  .tb.down { background: rgba(255,255,255,.45); }
+  #bL { left: 16px; bottom: 22px; } #bR { left: 100px; bottom: 22px; }
+  #bB { right: 100px; bottom: 22px; } #bA { right: 16px; bottom: 60px; width: 78px; height: 78px; background: rgba(30,120,255,.35); }
+  #bS { left: 50%; transform: translateX(-50%); top: 10px; width: 92px; height: 34px; border-radius: 17px; font-size: 9px; }
+</style>
+</head>
+<body>
+<canvas id="game" width="768" height="432"></canvas>
+<div id="touch">
+  <div class="tb" id="bL" data-k="ArrowLeft">&#9664;</div>
+  <div class="tb" id="bR" data-k="ArrowRight">&#9654;</div>
+  <div class="tb" id="bB" data-k="KeyX">B</div>
+  <div class="tb" id="bA" data-k="Space">A</div>
+  <div class="tb" id="bS" data-k="Enter">START</div>
+</div>
+<script src="js/game.js"></script>
+</body>
+</html>
