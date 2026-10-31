@@ -563,7 +563,7 @@ function build14() {
   var L = newLevel(72);
   gr(L, 0, 16); en(L, 'coco', 9); stairs(L, 12, 3, 1);
   gr(L, 15, 30, 9); put(L, 20, 5, 'M'); put(L, 24, 5, '?'); en(L, 'rodante', 27, 8);
-  put(L, 31, 9, '-----------------------');
+  put(L, 31, 9, '-----------------------'); put(L, 34, 5, 'M');
   gr(L, 54, 71, 9);
   L.arena = { lock: 30 * T, trigger: 32 * T, minX: 40 * T, maxX: 51 * T };
   L.trophy = 63;
@@ -602,7 +602,7 @@ function startLevel() {
   G.time = 300; G.timeTick = 0; G.locked = false; G.bossDone = false; G.golT = 0; G.netShake = 0; G.dialog = 0; G.paused = false; G.endT = 0;
   boss = null;
   if (L.arena) {
-    boss = { x: 48 * T, y: 9 * T - 104, w: 60, h: 104, vx: 0, vy: 0, face: -1, walk: -1, hp: 3, inv: 0, state: 'wait', jumpT: 120, throwT: 90, onGround: true, rot: 0, t: 0, flash: 0 };
+    boss = { x: 48 * T, y: 9 * T - 104, w: 60, h: 104, vx: 0, vy: 0, face: -1, walk: -1, hp: 3, inv: 0, state: 'wait', jumpT: 200, throwT: 150, onGround: true, rot: 0, t: 0, flash: 0 };
   }
   audio.play(TH.music);
   setState('play');
@@ -909,7 +909,7 @@ function updateBoss() {
   if (b.retreat > 0) { b.retreat--; b.vx = 3.5; }
   else {
     if (Math.random() < 0.006) b.walk = -b.walk;
-    b.vx = b.walk * (0.9 + phase * 0.6);
+    b.vx = b.walk * (0.6 + phase * 0.25);
   }
   if (b.x < L.arena.minX) b.walk = 1;
   if (b.x > L.arena.maxX) { b.walk = -1; b.x = L.arena.maxX; }
@@ -917,16 +917,17 @@ function updateBoss() {
   var wasG = b.onGround;
   var r = moveBody(b, false);
   b.onGround = r.land;
-  if (b.onGround && !wasG) { G.shake = 14; audio.sfx('thud'); }
-  if (--b.jumpT <= 0 && b.onGround) { b.vy = -(9 + phase * 1.2); b.jumpT = rnd(110, 200) - phase * 30; }
+  if (b.onGround && !wasG) { G.shake = 8; audio.sfx('thud'); }
+  if (--b.jumpT <= 0 && b.onGround) { b.vy = -(8 + phase * 0.5); b.jumpT = rnd(180, 280) - phase * 20; }
   if (--b.throwT <= 0) {
-    var n = phase === 2 ? 3 : 1;
+    var n = phase === 2 ? 2 : 1;
     for (var k = 0; k < n; k++) bossThrow(b, phase, k);
-    b.throwT = rnd(80, 140) - phase * 22;
+    b.throwT = rnd(140, 210) - phase * 15;
   }
   // contacto
   if (!P.dead && b.inv <= 0 && overlap(P, b)) {
-    if (P.vy > 0 && P.y + P.h - P.vy <= b.y + 26) {
+    // cabeza generosa para pisarlo; cuerpo con zona de dano reducida
+    if (P.vy > 0 && P.y + P.h - P.vy <= b.y + 40) {
       b.hp--; b.inv = 90; b.flash = 90; audio.sfx('bosshit'); G.shake = 10;
       addScore(2000, b.x, b.y - 10);
       P.vy = -11; P.vx = -5; P.x = Math.min(P.x, b.x - P.w + 10);
@@ -935,7 +936,7 @@ function updateBoss() {
         b.state = 'dead'; b.vy = -9; b.vx = 1.5; addScore(5000, b.x, b.y - 30);
         shots.length = 0; audio.stop(); audio.sfx('bosshit');
       }
-    } else hurtPlayer();
+    } else if (overlap(P, { x: b.x + 12, y: b.y + 24, w: b.w - 24, h: b.h - 24 })) hurtPlayer();
   } else if (!P.dead && b.inv > 0 && overlap(P, b) && !(P.vy > 0)) {
     // durante invulnerabilidad empuja sin hacer dano
     P.vx = P.x < b.x ? -3 : 3;
@@ -945,12 +946,12 @@ function bossThrow(b, phase, k) {
   audio.sfx('throw');
   var dir = b.face, gy = 9 * T;
   var sx = b.x + b.w / 2 + dir * 30, sy = b.y + 40;
-  var sword = phase >= 1 && (Math.random() < 0.5 || k > 0);
+  var sword = phase === 2 && (Math.random() < 0.4 || k > 0);
   if (sword) {
-    shots.push({ kind: 'espada', x: sx, y: sy - 20, vx: dir * rnd(2.5, 4.5) * (1 + k * 0.25), vy: -rnd(7, 9), g: 0.28, r: 12, rot: 0 });
+    shots.push({ kind: 'espada', x: sx, y: sy - 20, vx: dir * rnd(2, 3), vy: -rnd(7, 8.5), g: 0.28, r: 12, rot: 0, delay: k * 30 });
   } else {
     var high = Math.random() < 0.45;
-    shots.push({ kind: 'bala', x: sx, y: high ? gy - 78 : gy - 16, vx: dir * (3.2 + phase * 0.7), vy: 0, g: 0, r: 10, rot: 0, delay: k * 18 });
+    shots.push({ kind: 'bala', x: sx, y: high ? gy - 78 : gy - 16, vx: dir * (2.4 + phase * 0.3), vy: 0, g: 0, r: 10, rot: 0, delay: k * 30 });
   }
 }
 function updateShots() {
@@ -959,7 +960,7 @@ function updateShots() {
     if (s.delay > 0) { s.delay--; continue; }
     s.vy += s.g; s.x += s.vx; s.y += s.vy; s.rot += 0.35 * Math.sign(s.vx || 1);
     if (s.x < cam.x - 60 || s.x > cam.x + W + 60 || s.y > H + 40) { shots.splice(i, 1); continue; }
-    var hb = { x: s.x - s.r * 0.7, y: s.y - s.r * 0.7, w: s.r * 1.4, h: s.r * 1.4 };
+    var hb = { x: s.x - s.r * 0.55, y: s.y - s.r * 0.55, w: s.r * 1.1, h: s.r * 1.1 };
     if (!P.dead && overlap(P, hb)) hurtPlayer();
   }
 }
